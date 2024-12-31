@@ -1,13 +1,18 @@
-import { NavLink } from "react-router-dom"
+import { useMemo } from "react"
+import { NavLink, useLocation } from "react-router-dom"
 
 function Header() {
+  const {pathname} = useLocation()
+
+  const isHome = useMemo(() => pathname === '/' , [pathname])
+  console.log(isHome)
 
   return (
-    <header className="bg-slate-800">
-      <div className="mx-auto container p-5">
+    <header className={isHome ? 'bg-header bg-center bg-cover' : 'bg-slate-800'}>
+      <div className="mx-auto container px-5 py-8">
         <div className="flex justify-between items-center">
           <div>
-            <img className="w-24" src="/logo.svg" alt="logotype" />
+            <img className="w-32" src="/logo.svg" alt="logotype" />
           </div>
 
           <nav className="flex gap-4">
@@ -24,6 +29,43 @@ function Header() {
            }>Favorites</NavLink>
           </nav>
         </div>
+        {isHome && (
+          <form className="md:w-1/2 2xl:w-1/3 bg-orange-400 my-24 p-6 rounded-lg shadow space-y-6">
+            <div className="space-y-4">
+              <label 
+                htmlFor="ingredient"
+                className="block text-white uppercase font-extrabold text-lg"
+              >Name or Ingredients</label>
+              <input 
+                id="ingredient"
+                name="ingredient"
+                type="text" 
+                className="p-3 w-full rounded-lg focus:outline-none"
+                placeholder="Name or Ingredient. E.g., Vodka, Tequila, Coffee."
+              />
+            </div>
+
+            <div className="space-y-4">
+              <label 
+                htmlFor="category"
+                className="block text-white uppercase font-extrabold text-lg"
+              >Category</label>
+              <select 
+                id="category"
+                name="category"
+                className="p-3 w-full rounded-lg focus:outline-none"
+              >
+                <option value="">-- Select --</option>
+              </select>
+            </div>
+
+            <input 
+              type="submit" 
+              value="Find Cocktail" 
+              className="cursor-pointer bg-orange-800 hover:bg-orange-900 text-white uppercase font-extrabold w-full p-2 rounded-lg"
+            />
+          </form>
+        )}
       </div>
     </header>
   )
