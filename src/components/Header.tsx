@@ -1,17 +1,45 @@
-import { useEffect, useMemo } from "react"
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react"
 import { NavLink, useLocation } from "react-router-dom"
 import { useAppStore } from "../stores/useAppStore"
 
+const searchFiltersInitialState = {
+  ingredient: '',
+  category: ''
+}
+
 function Header() {
+  const [searchFilters, setSearchFilters] = useState(searchFiltersInitialState)
   const {pathname} = useLocation()
   const isHome = useMemo(() => pathname === '/' , [pathname])
   
-  const fetchCategories = useAppStore(state => state.fetchCategories)
   const categories = useAppStore(state => state.categories)
+  const fetchCategories = useAppStore(state => state.fetchCategories)
+  const searchRecipes = useAppStore(state => state.searchRecipes)
 
   useEffect(() => {
     fetchCategories()
   }, [fetchCategories])
+
+  const handleChange = (ev:ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
+    const {name, value} = ev.target
+
+    setSearchFilters({
+      ...searchFilters,
+      [name]: value
+    })
+  }
+
+  const handleSubmit = (ev:FormEvent<HTMLFormElement>) => {
+    ev.preventDefault()
+
+    // TODO: Validation
+    if(Object.values(searchFilters).includes('')){
+      console.log('Todos los campos son obligatorios')
+      return
+    }
+
+    searchRecipes(searchFilters)
+  }
 
   return (
     <header className={isHome ? 'bg-header bg-center bg-cover' : 'bg-slate-800'}>
@@ -36,7 +64,9 @@ function Header() {
           </nav>
         </div>
         {isHome && (
-          <form className="md:w-1/2 2xl:w-1/3 bg-orange-400 my-24 p-6 rounded-lg shadow space-y-6">
+          <form 
+            onSubmit={handleSubmit}
+            className="md:w-1/2 2xl:w-1/3 bg-orange-400 my-24 p-6 rounded-lg shadow space-y-6">
             <div className="space-y-4">
               <label 
                 htmlFor="ingredient"
@@ -48,6 +78,8 @@ function Header() {
                 type="text" 
                 className="p-3 w-full rounded-lg focus:outline-none"
                 placeholder="Name or Ingredient. E.g., Vodka, Tequila, Coffee."
+                onChange={handleChange}
+                value={searchFilters.ingredient}
               />
             </div>
 
@@ -60,6 +92,8 @@ function Header() {
                 id="category"
                 name="category"
                 className="p-3 w-full rounded-lg focus:outline-none"
+                value={searchFilters.category}
+                onChange={handleChange}
               >
                 <option value="">-- Select --</option>
                 {categories.drinks.map(category => (
