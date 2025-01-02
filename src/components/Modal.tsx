@@ -5,9 +5,11 @@ import { Recipe } from '../types';
 
 function Modal() {
   const modal = useAppStore(state => state.modal)
-  const closeModal = useAppStore(state => state.closeModal)
   const recipe = useAppStore(state => state.recipe)
-
+  const handleClickAddFavorite = useAppStore(state => state.handleClickAddFavorite)
+  const closeModal = useAppStore(state => state.closeModal)
+  const favoriteExists = useAppStore(state => state.favoriteExists)
+  
   const renderIngredients = () => {
     const ingredients: JSX.Element[] = []
     for(let i = 1; i <= 13; i++) {
@@ -26,7 +28,6 @@ function Modal() {
     return ingredients
   }
   
-
   return (
     <>
       <Transition appear show={modal} as={Fragment}>
@@ -83,7 +84,11 @@ function Modal() {
                     <button
                       type='button'
                       className='w-full rounded-lg bg-orange-600 p-3 font-bold uppercase text-white shadow hover:bg-orange-500'
-                    >Add to Favorites
+                      onClick={() => {
+                        handleClickAddFavorite(recipe)
+                        closeModal()
+                      }}
+                    >{favoriteExists(recipe.idDrink) ? 'Remove from Favorites' : 'Add to Favorites'}
                     </button>
                   </div>
                 </DialogPanel>
